@@ -6,7 +6,7 @@ import bson
 import gridfs
 from pymongo import MongoClient
 
-from models.bsonimage import BsonImage, BsonImageList
+from ajna_img_functions.models.bsonimage import BsonImage, BsonImageList
 
 TEST_PATH = os.path.abspath(os.path.dirname(__file__))
 IMG_FOLDER = os.path.join(TEST_PATH)

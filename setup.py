@@ -8,7 +8,7 @@ setup(
     license='GPL',
     author='Ivan Brasilico',
     author_email='brasilico.ivan@gmail.com',
-    packages=['ajna_img_functions'],
+    packages=find_packages(),
     install_requires=[
         'imageio',
         'pymongo',

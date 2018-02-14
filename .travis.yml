@@ -1,6 +1,7 @@
 language: python
 
 services:
+  - mongodb
 
 matrix:
   include:

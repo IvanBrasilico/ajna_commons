@@ -8,7 +8,7 @@ import unittest
 import gridfs
 from pymongo import MongoClient
 
-from image_aq.models.bsonimage import BsonImage, BsonImageList
+from ajna_commons.models.bsonimage import BsonImage, BsonImageList
 
 CARGAS = [1000, 10000]
 TEST_PATH = os.path.abspath(os.path.dirname(__file__))

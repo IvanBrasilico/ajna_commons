@@ -1,7 +1,7 @@
 from setuptools import find_packages, setup
 
 setup(
-    name='ajna_img_functions',
+    name='ajna_commons',
     description='AJNA_MOD Visao computacional e Aprendizado de Maquina na Vigilancia Aduaneira',
     version='0.0.1',
     url='https://github.com/IvanBrasilico/virasana',

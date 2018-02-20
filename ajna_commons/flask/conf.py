@@ -47,6 +47,10 @@ if MONGODB_URI:
 else:
     DATABASE = 'test'
 
+
+SENTRY_DSN = os.environ.get('SENTRY_DSN')
+
+
 # initialize constants used for server queuing
 TIMEOUT = 10
 BATCH_SIZE = 1000

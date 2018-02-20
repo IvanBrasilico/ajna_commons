@@ -1,39 +1,54 @@
+"""Define configurações comuns aos módulos do AJNA
+Ex.:
+SECRET - chave para criptografia da sessão
+REDIS SERVER
+MONGODB SERVER
+Custom messages- mensagens customizadas para módulos de login, segurança,
+ erro, etc
+Configurações de logging, etc
+"""
+import logging
 import os
 import pickle
+import redis
 import tempfile
-# TODO: Configure customized CSRF error
 from flask import render_template
-# from flask_wtf.csrf import CSRFError
-
+from ajna_commons.flask.log import logger
+from dominate.tags import img
 
 tmpdir = tempfile.mkdtemp()
+logo = img(src='/static/css/images/logo.png')
 
 try:
-    SECRET = None
     with open('SECRET', 'rb') as secret:
         try:
             SECRET = pickle.load(secret)
         except pickle.PickleError:
-            pass
+            SECRET = None
 except FileNotFoundError:
-    pass
+    SECRET = None
 
-if not SECRET:
+if SECRET is None:
     SECRET = os.urandom(24)
     with open('SECRET', 'wb') as out:
         pickle.dump(SECRET, out, pickle.HIGHEST_PROTOCOL)
 
 
-# TODO: Configure customized CSRF error
-#  http://flask.pocoo.org/docs/0.12/patterns/packages/
-# @app.errorhandler(CSRFError)
+BSON_REDIS = 'bson'
+REDIS_URL = os.environ.get('REDIS_URL')
+if not REDIS_URL:
+    REDIS_URL = 'redis://localhost:6379'
+BACKEND = BROKER = REDIS_URL
+redisdb = redis.StrictRedis.from_url(REDIS_URL)
 
+MONGODB_URI = os.environ.get('MONGODB_URI')
+if MONGODB_URI:
+    DATABASE = ''.join(MONGODB_URI.rsplit('/')[-1:])
+    # print(DATABASE)
+else:
+    DATABASE = 'test'
 
-def handle_csrf_error(e):
-    return render_template('csrf_error.html', reason=e.description), 400
-
-# TODO: Configure customized login error
-#  http://flask.pocoo.org/docs/0.12/patterns/packages/
-# https://flask-login.readthedocs.io/en/latest/ - Customizing the login
-# login_manager.login_view = "users.login"
-# login_manager.login_message = u"Bonvolu ensaluti por uzi tiun paĝon."
+# initialize constants used for server queuing
+TIMEOUT = 10
+BATCH_SIZE = 1000
+ALLOWED_EXTENSIONS = set(['csv', 'zip', 'txt', 'png', 'jpg', 'jpeg', 'sch'])

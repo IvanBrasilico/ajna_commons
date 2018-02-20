@@ -8,5 +8,3 @@ from flask import render_template
 
 def handle_csrf_error(e):
     return render_template('csrf_error.html', reason=e.description), 400
-
-

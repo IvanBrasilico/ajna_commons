@@ -2,10 +2,7 @@ from urllib.parse import urljoin, urlparse
 
 from flask import request, redirect, url_for
 from flask_login import (LoginManager, UserMixin)
-from flask_wtf import FlaskForm
 from werkzeug.security import generate_password_hash  # , check_password_hash
-from wtforms import BooleanField, PasswordField, StringField, SubmitField
-from wtforms.validators import DataRequired, Length
 
 login_manager = LoginManager()
 login_manager.login_view = 'login'
@@ -14,7 +11,7 @@ login_manager.session_protection = 'strong'
 # Customized login error
 #  http://flask.pocoo.org/docs/0.12/patterns/packages/
 # https://flask-login.readthedocs.io/en/latest/ - Customizing the login
-login_manager.login_message = u"Efetue login para começar."
+login_manager.login_message = u'Efetue login para começar.'
 
 
 @login_manager.unauthorized_handler
@@ -53,10 +50,12 @@ class DBUser():
             if password:
                 # print({'username': username,
                 #       'password': password})
-                user = cls.dbsession.users.find_one({'username': username,
-                                                     'password': cls.encript(password)})
+                user = cls.dbsession.users.find_one(
+                    {'username': username,
+                     'password': cls.encript(password)})
             else:
-                user = cls.dbsession.users.find_one({'username': username})
+                user = cls.dbsession.users.find_one(
+                    {'username': username})
             # print('User retrieved ', user)
             if user:
                 return DBUser(username, password)

@@ -23,7 +23,8 @@ class CustomAdapter(logging.LoggerAdapter):
     """
 
     def process(self, msg, kwargs):
-        return '[%s][%s] %s' % (self.extra['username'], self.extra['teste'], msg), kwargs
+        return '[%s][%s] %s' % (self.extra['username'],
+                                self.extra['teste'], msg), kwargs
 
 
 logging.basicConfig(level=os.environ.get('LOGLEVEL', 'INFO'))

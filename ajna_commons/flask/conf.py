@@ -7,13 +7,12 @@ Custom messages- mensagens customizadas para módulos de login, segurança,
  erro, etc
 Configurações de logging, etc
 """
-import logging
+# import logging
 import os
 import pickle
 import redis
 import tempfile
-from flask import render_template
-from ajna_commons.flask.log import logger
+# from ajna_commons.flask.log import logger
 from dominate.tags import img
 
 tmpdir = tempfile.mkdtemp()

@@ -44,13 +44,11 @@ activity_handler = logging.FileHandler(activity_file)
 
 out_handler = logging.StreamHandler(sys.stdout)
 
-sentry_handler = SentryHandler(SENTRY_DSN)
 
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 error_handler.setFormatter(formatter)
 activity_handler.setFormatter(formatter)
 out_handler.setFormatter(formatter)
-sentry_handler.setFormatter(formatter)
 
 if os.environ.get('DEBUG', 'None') == '1':
     logger.setLevel(logging.DEBUG)
@@ -62,8 +60,12 @@ else:
     logger.addHandler(error_handler)
     out_handler.setLevel(logging.INFO)
     logger.addHandler(out_handler)
-    sentry_handler.setLevel(logging.WARNING)
-    logger.addHandler(sentry_handler)
+    if SENTRY_DSN:
+        sentry_handler = SentryHandler(SENTRY_DSN)
+        sentry_handler.setFormatter(formatter)
+        sentry_handler.setLevel(logging.WARNING)
+        sentry_handler.setFormatter(formatter)
+        logger.addHandler(sentry_handler)
     logger.setLevel(logging.INFO)
     # Only show info, not warnings, erros, or critical in this log
     activity_handler.addFilter(MyFilter(logging.INFO))

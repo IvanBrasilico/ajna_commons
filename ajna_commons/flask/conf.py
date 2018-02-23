@@ -55,3 +55,17 @@ SENTRY_DSN = os.environ.get('SENTRY_DSN')
 TIMEOUT = 10
 BATCH_SIZE = 1000
 ALLOWED_EXTENSIONS = set(['csv', 'zip', 'txt', 'png', 'jpg', 'jpeg', 'sch'])
+
+
+# Address of MicroServices from ajna modules
+# Devem ser definidas em variáveis de ambiente no Servidor de Deploy
+# o wsgi_debug utilizará estes, fixos
+BHADRASANA_URL = os.environ.get('BHADRASANA_URL')
+if not BHADRASANA_URL:
+    BHADRASANA_URL = 'http://localhost:5000'
+VIRASANA_URL = os.environ.get('VIRASANA_URL')
+if not VIRASANA_URL:
+    VIRASANA_URL = 'http://localhost:5001'
+PADMA_URL = os.environ.get('PADMA_URL')
+if not PADMA_URL:
+    PADMA_URL = 'http://localhost:5002'

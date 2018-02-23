@@ -60,6 +60,7 @@ else:
     logger.addHandler(error_handler)
     out_handler.setLevel(logging.INFO)
     logger.addHandler(out_handler)
+    sentry_handler = None
     if SENTRY_DSN:
         sentry_handler = SentryHandler(SENTRY_DSN)
         sentry_handler.setFormatter(formatter)

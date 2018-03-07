@@ -1,6 +1,7 @@
 import gzip
 import os
 from collections import OrderedDict
+from hashlib import md5
 from pathlib import Path
 
 import bson
@@ -62,9 +63,17 @@ class BsonImage():
         return result
 
     def tomongo(self, fs):
-        file_id = fs.put(self._content, filename=self._filename,
-                         metadata=self._metadata)
-        return file_id
+        m = md5()
+        m.update(self._content)
+        grid_out = fs.find_one({'md5': m.hexdigest()})
+        if grid_out:
+            if grid_out.filename == self._filename:
+                print(self._filename, ' tentativa de inserir pela segunda vez!!')
+                # File exists, abort!
+                return grid_out._id
+        # Insert File
+        return fs.put(self._content, filename=self._filename,
+                             metadata=self._metadata)
 
     @classmethod
     def frommongo(cls, file_id, fs):

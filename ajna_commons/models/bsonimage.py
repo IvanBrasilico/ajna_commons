@@ -68,12 +68,13 @@ class BsonImage():
         grid_out = fs.find_one({'md5': m.hexdigest()})
         if grid_out:
             if grid_out.filename == self._filename:
-                print(self._filename, ' tentativa de inserir pela segunda vez!!')
+                print(self._filename,
+                      ' tentativa de inserir pela segunda vez!!')
                 # File exists, abort!
                 return grid_out._id
         # Insert File
         return fs.put(self._content, filename=self._filename,
-                             metadata=self._metadata)
+                      metadata=self._metadata)
 
     @classmethod
     def frommongo(cls, file_id, fs):

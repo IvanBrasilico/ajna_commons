@@ -6,6 +6,7 @@ from pathlib import Path
 
 import bson
 from bson.codec_options import CodecOptions
+from ajna_commons.flask.log import logger
 
 
 class BsonImage():
@@ -68,8 +69,10 @@ class BsonImage():
         grid_out = fs.find_one({'md5': m.hexdigest()})
         if grid_out:
             if grid_out.filename == self._filename:
-                print(self._filename,
-                      ' tentativa de inserir pela segunda vez!!')
+                logger.warning(
+                    self._filename +
+                    ' MD5(' + m.hexdigest() + ')' +
+                    ' tentativa de inserir pela segunda vez!!')
                 # File exists, abort!
                 return grid_out._id
         # Insert File

@@ -31,6 +31,8 @@ def sanitizar(text, norm_function=unicode_sanitizar):
     Retorna texto sanitizado e normalizado
     Depois desse produto, suas buscas nunca mais serão as mesmas!!! :-p
     """
+    if text is None or text == '':
+        return text
     text = text.strip()
     text = text.casefold()
     text = norm_function(text)

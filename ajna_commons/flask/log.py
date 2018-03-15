@@ -49,14 +49,15 @@ formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 error_handler.setFormatter(formatter)
 activity_handler.setFormatter(formatter)
 out_handler.setFormatter(formatter)
+error_handler.setLevel(logging.WARNING)
 
 if os.environ.get('DEBUG', 'None') == '1':
     logger.setLevel(logging.DEBUG)
     logger.addHandler(out_handler)
+    logger.addHandler(error_handler)
 else:
     activity_handler.setLevel(logging.INFO)
     logger.addHandler(activity_handler)
-    error_handler.setLevel(logging.WARNING)
     logger.addHandler(error_handler)
     out_handler.setLevel(logging.INFO)
     logger.addHandler(out_handler)

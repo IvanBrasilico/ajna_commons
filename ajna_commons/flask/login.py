@@ -61,7 +61,10 @@ class DBUser():
                 return DBUser(username, password)
         else:
             if username:
-                return DBUser(username, password)
+                if not password:
+                    return DBUser(username, password)
+                if username == password:
+                    return DBUser(username, password)
         return None
 
 

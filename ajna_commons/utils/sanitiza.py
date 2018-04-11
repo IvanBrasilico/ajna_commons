@@ -1,5 +1,4 @@
-"""
-Funções para normalização e limpeza de texto e listas de textos.
+"""Funções para normalização e limpeza de texto e listas de textos.
 
 """
 import unicodedata

@@ -1,7 +1,8 @@
 from urllib.parse import urljoin, urlparse
-
-from flask import request, redirect, url_for
+from flask import abort, redirect, render_template, request, url_for
 from flask_login import (LoginManager, UserMixin)
+from flask_login import login_required, login_user, logout_user
+# from urllib.parse import urlparse, urljoin
 from werkzeug.security import generate_password_hash  # , check_password_hash
 
 login_manager = LoginManager()
@@ -12,6 +13,38 @@ login_manager.session_protection = 'strong'
 #  http://flask.pocoo.org/docs/0.12/patterns/packages/
 # https://flask-login.readthedocs.io/en/latest/ - Customizing the login
 login_manager.login_message = u'Efetue login para começar.'
+
+
+def configure(app):
+    @app.route('/login', methods=['GET', 'POST'])
+    def login():
+        """View para efetuar login."""
+        if request.method == 'POST':
+            username = request.form.get('username')
+            password = request.form.get('senha')
+            registered_user = authenticate(username, password)
+            if registered_user is not None:
+                print('Logged in..')
+                print(login_user(registered_user))
+                # print('Current user ', current_user)
+                next_url = request.args.get('next')
+                if not is_safe_url(next_url):
+                    return abort(400)
+                return redirect(next_url or url_for('index'))
+            else:
+                return abort(401)
+        else:
+            return render_template('login.html', form=request.form)
+
+    @app.route('/logout')
+    @login_required
+    def logout():
+        """View para efetuar logout."""
+        logout_user()
+        next = request.args.get('next')
+        if not is_safe_url(next):
+            next = None
+        return redirect(next or url_for('index'))
 
 
 @login_manager.unauthorized_handler

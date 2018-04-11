@@ -1,4 +1,5 @@
 """Define configurações comuns aos módulos do AJNA
+
 Ex.:
 SECRET - chave para criptografia da sessão
 REDIS SERVER
@@ -6,6 +7,7 @@ MONGODB SERVER
 Custom messages- mensagens customizadas para módulos de login, segurança,
  erro, etc
 Configurações de logging, etc
+
 """
 # import logging
 import os

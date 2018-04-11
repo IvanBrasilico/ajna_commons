@@ -1,3 +1,4 @@
+""" Trasforma imagem(ns) e xml(s) em registro(s) BSON."""
 import gzip
 import os
 from collections import OrderedDict
@@ -19,7 +20,7 @@ class BsonImage():
             if file.exists():
                 with open(filename, 'rb') as f:
                     content = f.read()
-                print('File found')
+                # print('File found')
                 self._filename = os.path.basename(filename)
                 self._content = content
                 self._metadata = kwargs

@@ -1,9 +1,19 @@
+"""Funções e views que dão suporte ao LOGIN das aplicações centralizadas.
+
+Classes para acessar os usuários do Banco de Dados
+Views padrão login e logout (Flask)
+Funções e classes para gerenciar login e usuários (Flask Login)
+
+Para utilizar, importar e chamar configure(app) em uma aplicação Flask
+
+DBUser.dbsession deve receber a conexão com o BD.
+"""
 from urllib.parse import urljoin, urlparse
 from flask import abort, redirect, render_template, request, url_for
 from flask_login import (LoginManager, UserMixin)
 from flask_login import login_required, login_user, logout_user
 # from urllib.parse import urlparse, urljoin
-from werkzeug.security import generate_password_hash  # , check_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 
 login_manager = LoginManager()
 login_manager.login_view = 'login'
@@ -58,18 +68,37 @@ def unauthorized():
 class DBUser():
     dbsession = None
 
-    def __init__(self, id, password):
+    def __init__(self, id, password=None):
         self.id = id
         self.name = str(id)
-        self._password = self.encript(password)
+        self._password = password
 
     @classmethod
-    def encript(self, password):
+    def add(cls, username, password):
+        """Cria usuário ou muda senha se ele existe."""
+        if not cls.dbsession:
+            raise Exception('Sem conexão com o Banco de Dados!')
+        encripted = cls.encript(password)
+        cursor = cls.dbsession.users.update(
+            {'username': username},
+            {'username': username,
+             'password': encripted},
+            upsert=True)
+        print('cursor', cursor)
+        return DBUser.get(username, password)
+
+    @classmethod
+    def encript(cls, password):
         """Receives plan text password, returns encripted version"""
-        # TODO: make a script to add Users, disable next line
-        # and test if it works
-        return password
+        if password is None:
+            return ''
         return generate_password_hash(password)
+
+    def check(self, encripted):
+        """Checks user password against encripted version"""
+        if self._password is None:
+            return False
+        return check_password_hash(encripted, self._password)
 
     @classmethod
     def get(cls, username, password=None):
@@ -77,21 +106,20 @@ class DBUser():
         is correct
         returns DBUser or None
         """
-        # print('Getting user. dbsession=', cls.dbsession)
+        print('Getting user. dbsession=', cls.dbsession)
         if cls.dbsession:
             # print('DBSEssion ', cls.dbsession)
+            dbuser = DBUser(username, password)
+            user = cls.dbsession.users.find_one(
+                {'username': username})
             if password:
-                # print({'username': username,
-                #       'password': password})
-                user = cls.dbsession.users.find_one(
-                    {'username': username,
-                     'password': cls.encript(password)})
-            else:
-                user = cls.dbsession.users.find_one(
-                    {'username': username})
-            # print('User retrieved ', user)
-            if user:
-                return DBUser(username, password)
+                encripted = user['password']
+                print('username', username,
+                       'passed password', password)
+                print('encripted', encripted)
+                if not dbuser.check(encripted):
+                    return None
+            return DBUser(username)
         else:
             if username:
                 if not password:

@@ -115,7 +115,7 @@ class DBUser():
             if password:
                 encripted = user['password']
                 print('username', username,
-                       'passed password', password)
+                      'passed password', password)
                 print('encripted', encripted)
                 if not dbuser.check(encripted):
                     return None

@@ -34,7 +34,7 @@ logger = logging.getLogger('ajna')
 
 fn = getattr(sys.modules['__main__'], '__file__')
 root_path = os.path.abspath(os.path.dirname(fn))
-if root_path.find('.exe') !=-1:
+if root_path.find('.exe') != -1:
     root_path = os.path.dirname(__file__)
 log_file = os.path.join(root_path, 'error.log')
 print('Fazendo log de erros e alertas no arquivo ', log_file)

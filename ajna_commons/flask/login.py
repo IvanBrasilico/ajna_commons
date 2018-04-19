@@ -4,16 +4,16 @@ Classes para acessar os usuários do Banco de Dados
 Views padrão login e logout (Flask)
 Funções e classes para gerenciar login e usuários (Flask Login)
 
-Para utilizar, importar e chamar configure(app) em uma aplicação Flask
-
 DBUser.dbsession deve receber a conexão com o BD.
+
 """
 from urllib.parse import urljoin, urlparse
+
 from flask import abort, redirect, render_template, request, url_for
-from flask_login import (LoginManager, UserMixin)
-from flask_login import login_required, login_user, logout_user
+from flask_login import (LoginManager, UserMixin, login_required, login_user,
+                         logout_user)
 # from urllib.parse import urlparse, urljoin
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 
 login_manager = LoginManager()
 login_manager.login_view = 'login'
@@ -26,6 +26,12 @@ login_manager.login_message = u'Efetue login para começar.'
 
 
 def configure(app):
+    """Insere as views de login e logout na app.
+
+    Para utilizar, importar modulo login e chamar configure(app)
+    em uma aplicação Flask.
+
+    """
     @app.route('/login', methods=['GET', 'POST'])
     def login():
         """View para efetuar login."""
@@ -59,6 +65,7 @@ def configure(app):
 
 @login_manager.unauthorized_handler
 def unauthorized():
+    """Gerenciador de usuário não autorizado padrão do flask-login."""
     message = 'Não autorizado! ' + \
         'Efetue login novamente com usuário e senha válidos.'
     return redirect(url_for('login',
@@ -66,9 +73,29 @@ def unauthorized():
 
 
 class DBUser():
+    """Classe que valida o usuário em uma base MongoDB.
+
+    A conexão à base MongoDB deve ser informada antes do uso da classe.
+    Se dbsession for None, get retorna usuario caso username==senha
+    (Comportamento utilizado para testes unitários)
+    Podem ser passadas outras conexões a outros BD caso implementem os métodos
+    users.update e users.find_one, ou criada uma classe descendente de
+    DBUser que modifique os métodos get e add.
+
+    A maioria dos métodos são estáticos, sendo usados diretamente:
+        DBUser.dbsession = meu_PyMongoClient
+        DBUser.get(usuario, senha) retorna DBUSer se existir e
+            se senha correta
+        DBUser.add(usuario, senha) adiciona DBUser
+
+    A classe DBUser é utilizada pela classe User, padrão do flask-login
+
+    """
+
     dbsession = None
 
     def __init__(self, id, password=None):
+        """Apenas monta uma instância."""
         self.id = id
         self.name = str(id)
         self._password = password
@@ -89,22 +116,24 @@ class DBUser():
 
     @classmethod
     def encript(cls, password):
-        """Receives plan text password, returns encripted version"""
+        """Recebe senha plana, retorna versão criptografada."""
         if password is None:
             return ''
         return generate_password_hash(password)
 
     def check(self, encripted):
-        """Checks user password against encripted version"""
+        """Verifica senha informada contra a versão criptograda do BD."""
         if self._password is None:
             return False
         return check_password_hash(encripted, self._password)
 
     @classmethod
     def get(cls, username, password=None):
-        """Test if user exists, and if passed, if password
-        is correct
-        returns DBUser or None
+        """Testa se Usuario existe. Se senha for passada, testa se é válida.
+
+        Retorna instância DBUser se usuário existe e senha válida, None se
+        Usuario não encontrado OU senha inválida.
+
         """
         print('Getting user. dbsession=', cls.dbsession)
         if cls.dbsession:
@@ -130,14 +159,24 @@ class DBUser():
 
 
 class User(UserMixin):
+    """Mixin padrão do flask-login.
+
+    Está utilizando DBUser como base de autenticação.
+    Para utilizar outra base de dados, criar outra classe com
+    comportamento similar a DBUSer.
+
+    """
+
     user_database = DBUser
 
     def __init__(self, id):
+        """Instancia User."""
         self.id = id
         self.name = str(id)
 
     @classmethod
     def get(cls, username, password=None):
+        """Consulta DBUser."""
         dbuser = cls.user_database.get(username, password)
         if dbuser:
             return User(dbuser.name)
@@ -145,6 +184,7 @@ class User(UserMixin):
 
 
 def authenticate(username, password):
+    """Método padrão do flask-login. Repassa responsabilidade a User."""
     user_entry = User.get(username, password)
     # print('authenticate user entry ', user_entry)
     return user_entry
@@ -152,11 +192,13 @@ def authenticate(username, password):
 
 @login_manager.user_loader
 def load_user(userid):
+    """Método padrão do flask-login. Repassa responsabilidade a User."""
     user_entry = User.get(userid)
     return user_entry
 
 
 def is_safe_url(target):
+    """Testa ocorrência de ataque de redirecionamento(URL Redirect/Pishing)."""
     ref_url = urlparse(request.host_url)
     test_url = urlparse(urljoin(request.host_url, target))
     return test_url.scheme in ('http', 'https') and \

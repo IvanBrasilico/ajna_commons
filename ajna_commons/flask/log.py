@@ -1,30 +1,43 @@
-"""Configuration of AJNA modules LOGs"""
+"""Configuration of AJNA modules LOGs.
+
+Aqui são configurados os diversos arquivos e métodos de logs que serão
+comuns aos módulos do sistema AJNA.
+
+Todo módulo deve importar este arquivo e usar o objeto logger criado
+para gravar eventos importantes.
+
+"""
 import logging
 import os
 import sys
 
 from flask_login import current_user
-from ajna_commons.flask.conf import SENTRY_DSN
 from raven.handlers.logging import SentryHandler
+
+from ajna_commons.flask.conf import SENTRY_DSN
 
 
 class MyFilter(object):
-    """Log only especified level (not upper levels)"""
+    """Log only especified level (not upper levels)."""
 
     def __init__(self, level):
+        """Configura level desejado."""
         self.__level = level
 
     def filter(self, logRecord):
+        """Retorna true se filtro no nível configurado."""
         return logRecord.levelno <= self.__level
 
 
 class CustomAdapter(logging.LoggerAdapter):
-    """
+    """Formata string de log.
+
     This example adapter expects the passed in dict-like object to have a
     'connid' key, whose value in brackets is prepended to the log message.
     """
 
     def process(self, msg, kwargs):
+        """Returna string formatada."""
         return '[%s][%s] %s' % (self.extra['username'],
                                 self.extra['teste'], msg), kwargs
 
@@ -76,6 +89,7 @@ else:
 
 
 def user_name(user):
+    """Recupera nome do usuário ativo. Se não houver retorna 'no user'."""
     if user:
         return user.name
     return 'no user'

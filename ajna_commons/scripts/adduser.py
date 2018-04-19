@@ -6,8 +6,9 @@ Uso:
 """
 import click
 from pymongo import MongoClient
-from ajna_commons.flask.login import DBUser
+
 from ajna_commons.flask.conf import DATABASE, MONGODB_URI
+from ajna_commons.flask.login import DBUser
 
 
 @click.command()

@@ -1,22 +1,20 @@
+"""Funções para tratar imagens."""
 import imageio
 
 
 def find_conteiner(afile):
-    """Heuristic dumb walk algorithm
+    """Heuristic dumb walk algorithm.
+
     Beginning on middle of top, left, right and bottom sizes,
     do a 'walk till find wall(gray>230)'.
     Besides simplicity, works well to find conteiner boundaries on majority
      of cases,
     so is a beggining and can acelerate anottations for training better
      algorithm
-
     Args:
-
-    afile: caminho da imagem no disco
-
+        afile: caminho da imagem no disco
     Returns:
-
-    xleft, ytop, xright, ybottom
+        xleft, ytop, xright, ybottom
 
     """
     im = imageio.imread(afile)[:, :, 0]

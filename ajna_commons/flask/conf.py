@@ -1,4 +1,4 @@
-"""Define configurações comuns aos módulos do AJNA
+"""Define configurações comuns aos módulos do AJNA.
 
 Ex.:
 SECRET - chave para criptografia da sessão
@@ -12,8 +12,9 @@ Configurações de logging, etc
 # import logging
 import os
 import pickle
-import redis
 import tempfile
+
+import redis
 # from ajna_commons.flask.log import logger
 from dominate.tags import img
 

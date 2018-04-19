@@ -1,11 +1,10 @@
-"""Funções para normalização e limpeza de texto e listas de textos.
-
-"""
+"""Funções para normalização e limpeza de texto e listas de textos."""
 import unicodedata
 
 
 def ascii_sanitizar(text):
-    """Remove marcas de diacríticos (acentos e caracteres especiais)
+    """Remove marcas de diacríticos (acentos e caracteres especiais).
+
     Retorna NFC normalizado ASCII
     """
     return unicodedata.normalize('NFKD', text) \
@@ -14,8 +13,9 @@ def ascii_sanitizar(text):
 
 
 def unicode_sanitizar(text):
-    """Remove marcas de diacríticos (acentos e caracteres especiais)
-    Retorna NFC normalizado
+    """Remove marcas de diacríticos (acentos e caracteres especiais).
+
+    Retorna NFC normalizado unicode
     """
     norm_txt = unicodedata.normalize('NFD', text)
     shaved = ''.join(char for char in norm_txt
@@ -24,9 +24,11 @@ def unicode_sanitizar(text):
 
 
 def sanitizar(text, norm_function=unicode_sanitizar):
-    """Remove espaços à direita e esquerda, passa para "casefold"(caixa baixa),
-    usa função normalização para retirar marcas de diacríticos (acentos e
-     caracteres especiais), remove espaços adicionais entre palavras.
+    """Faz uma sequência de acões de normalização/sanitização de texto.
+
+    Remove espaços à direita e esquerda, passa para "casefold"(caixa baixa),
+    usa função normalização norm_function para retirar marcas de diacríticos
+    (acentos e caracteres especiais), remove espaços adicionais entre palavras.
     Retorna texto sanitizado e normalizado
     Depois desse produto, suas buscas nunca mais serão as mesmas!!! :-p
     """
@@ -42,8 +44,10 @@ def sanitizar(text, norm_function=unicode_sanitizar):
 
 
 def sanitizar_lista(lista, norm_function=unicode_sanitizar):
-    """Percorre lista de listas sanitizando inline
-    Por ora só suporta lista 'bidimensional', como um csv"""
+    """Percorre lista de listas sanitizando inline.
+
+    Por ora só suporta lista 'bidimensional', como um csv
+    """
     for row in range(len(lista)):
         for col in range(len(lista[row])):
             lista[row][col] = sanitizar(lista[row][col], norm_function)

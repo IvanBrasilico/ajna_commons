@@ -1,6 +1,6 @@
-"""
-# FROM LabelImg
-# https://github.com/IvanBrasilico/labelImg/blob/master/libs/pascal_voc_io.py
+"""FROM LabelImg.
+https://github.com/IvanBrasilico/labelImg/blob/master/libs/pascal_voc_io.py
+
 """
 import codecs
 from xml.etree import ElementTree

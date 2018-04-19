@@ -1,6 +1,7 @@
+"""Teste de funcionalidade do MongoDB."""
 import os
-from pymongo import MongoClient
 
+from pymongo import MongoClient
 
 MONGODB_URI = os.environ.get('MONGODB_URI')
 if MONGODB_URI:

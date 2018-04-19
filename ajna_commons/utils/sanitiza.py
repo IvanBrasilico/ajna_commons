@@ -46,9 +46,17 @@ def sanitizar(text, norm_function=unicode_sanitizar):
 def sanitizar_lista(lista, norm_function=unicode_sanitizar):
     """Percorre lista de listas sanitizando inline.
 
-    Por ora só suporta lista 'bidimensional', como um csv
+    Por ora só suporta lista 'bidimensional', como um csv,
+    uma lista de strings, ou uma lista contendo listas de strings.
     """
     for row in range(len(lista)):
-        for col in range(len(lista[row])):
-            lista[row][col] = sanitizar(lista[row][col], norm_function)
+        linha = lista[row]
+        if isinstance(linha, str):
+            lista[row] = sanitizar(linha, norm_function)
+        elif isinstance(linha, list):
+            for col in range(len(lista[row])):
+                lista[row][col] = sanitizar(lista[row][col], norm_function)
+        else:
+            raise TypeError('Tipo não suportado (tipos suportados, list(str)' +
+                            'ou list(list(str). Ver documentação.')
     return lista

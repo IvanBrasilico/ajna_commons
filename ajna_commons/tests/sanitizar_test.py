@@ -1,7 +1,7 @@
 import unittest
 
-from ajna_commons.utils.sanitiza import ascii_sanitizar, \
-    unicode_sanitizar, sanitizar, sanitizar_lista
+from ajna_commons.utils.sanitiza import (ascii_sanitizar, sanitizar,
+                                         sanitizar_lista, unicode_sanitizar)
 
 
 class TestModel(unittest.TestCase):

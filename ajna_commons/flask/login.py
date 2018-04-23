@@ -62,14 +62,13 @@ def configure(app):
             next = None
         return redirect(next or url_for('index'))
 
-
-@login_manager.unauthorized_handler
-def unauthorized():
-    """Gerenciador de usuário não autorizado padrão do flask-login."""
-    message = 'Não autorizado! ' + \
-        'Efetue login novamente com usuário e senha válidos.'
-    return redirect(url_for('login',
-                            message=message))
+    @login_manager.unauthorized_handler
+    def unauthorized():
+        """Gerenciador de usuário não autorizado padrão do flask-login."""
+        message = 'Não autorizado! ' + \
+            'Efetue login novamente com usuário e senha válidos.'
+        return redirect(url_for('login',
+                                message=message))
 
 
 class DBUser():
@@ -141,18 +140,18 @@ class DBUser():
             dbuser = DBUser(username, password)
             user = cls.dbsession.users.find_one(
                 {'username': username})
+            if user is None:
+                return None
             if password:
                 encripted = user['password']
                 # print('username', username)  # , 'passed password', password)
                 # print('encripted', encripted)
                 if not dbuser.check(encripted):
                     return None
-            return DBUser(username)
+            return DBUser(username, password)
         else:
             if username:
-                if not password:
-                    return DBUser(username, password)
-                if username == password:
+                if (not password) or (username == password):
                     return DBUser(username, password)
         return None
 

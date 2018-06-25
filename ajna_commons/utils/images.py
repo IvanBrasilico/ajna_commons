@@ -5,6 +5,8 @@ from bson.objectid import ObjectId
 from gridfs import GridFS
 from PIL import Image
 
+from ajna_commons.flask.log import logger
+
 
 def recorta_imagem(image, coords, pil=False):
     """Recebe uma imagem serializada em bytes, retorna Imagem cortada.
@@ -19,14 +21,14 @@ def recorta_imagem(image, coords, pil=False):
 
     """
     if coords:
-        PILimage = Image.open(io.BytesIO(image))
-        im = np.asarray(PILimage)
-        im = im[coords[0]:coords[2], coords[1]:coords[3]]
-        PILimage = Image.fromarray(im)
+        pil_image = Image.open(io.BytesIO(image))
+        imarray = np.asarray(pil_image)
+        imarray = imarray[coords[0]:coords[2], coords[1]:coords[3]]
+        pil_image = Image.fromarray(imarray)
         if pil:
-            return PILimage
+            return pil_image
         image_bytes = io.BytesIO()
-        PILimage.save(image_bytes, 'JPEG')
+        pil_image.save(image_bytes, 'JPEG')
         image_bytes.seek(0)
     return image_bytes
 
@@ -43,6 +45,12 @@ def mongo_image(db, image_id):
 
 
 def get_imagens_recortadas(db, _id):
+    """Retorna recorte das bbox detectadas para a imagem _id.
+
+    Caso existam predições bbox gravadas/cacheadas nos metadados da
+    imagem, retorna, ao invés da imagem original completa, apenas os
+    recortes correspondentes a estes "bouding boxes" detectados.
+    """
     images = []
     image = mongo_image(db, _id)
     if image:
@@ -53,8 +61,10 @@ def get_imagens_recortadas(db, _id):
                 bbox = pred.get('bbox')
                 if bbox:
                     try:
-                        image = recorta_imagem(image, bbox, True)
-                        images.append(image)
-                    except:
-                        pass
+                        recorte = recorta_imagem(image, bbox, True)
+                        images.append(recorte)
+                    except Exception as err:
+                        logger.info('Erro em get_imagens_recortadas ' +
+                                    'Erro: %s\n bbox:%s\n imagem:%s' %
+                                    (str(err), bbox, _id), exc_info=True)
     return images

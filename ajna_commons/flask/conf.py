@@ -1,6 +1,6 @@
 """Define configurações comuns aos módulos do AJNA.
 
-    Exemplos:
+Exemplos:
 
     SECRET - chave para criptografia da sessão
     REDIS SERVER

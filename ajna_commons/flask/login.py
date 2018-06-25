@@ -1,10 +1,10 @@
 """Funções e views que dão suporte ao LOGIN das aplicações centralizadas.
 
-    Classes para acessar os usuários do Banco de Dados
-    Views padrão login e logout (Flask)
-    Funções e classes para gerenciar login e usuários (Flask Login)
+Classes para acessar os usuários do Banco de Dados
+Views padrão login e logout (Flask)
+Funções e classes para gerenciar login e usuários (Flask Login)
 
-    DBUser.dbsession deve receber a conexão com o BD.
+DBUser.dbsession deve receber a conexão com o BD.
 
 """
 from urllib.parse import urljoin, urlparse

@@ -29,7 +29,7 @@ class TestModel(unittest.TestCase):
         self._bsonimagelist = BsonImageList()
         self._bsonimagelist.addBsonImage(self._bsonimage)
         self._bsonimagelist.addBsonImage(self._bsonimage2)
-        self._db = MongoClient().test
+        self._db = MongoClient().unit_test
         self._fs = gridfs.GridFS(self._db)
 
     def tearDown(self):

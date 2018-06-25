@@ -12,10 +12,10 @@ import os
 import sys
 
 from flask_login import current_user
-from raven.handlers.logging import SentryHandler
+# from raven.handlers.logging import SentryHandler
 
-from ajna_commons.flask.conf import SENTRY_DSN
-
+# from ajna_commons.flask.conf import SENTRY_DSN
+SENTRY_DSN = None
 
 class MyFilter(object):
     """Log only especified level (not upper levels)."""

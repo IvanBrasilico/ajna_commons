@@ -20,16 +20,18 @@ def recorta_imagem(image, coords, pil=False):
         Um recorte da imagem em bytes ou formato PIL.Image se PIL=true
 
     """
-    if coords:
+    if isinstance(image, bytes):
         pil_image = Image.open(io.BytesIO(image))
-        imarray = np.asarray(pil_image)
-        imarray = imarray[coords[0]:coords[2], coords[1]:coords[3]]
-        pil_image = Image.fromarray(imarray)
-        if pil:
-            return pil_image
-        image_bytes = io.BytesIO()
-        pil_image.save(image_bytes, 'JPEG')
-        image_bytes.seek(0)
+    else:
+        pil_image = image
+    imarray = np.asarray(pil_image)
+    imarray = imarray[coords[0]:coords[2], coords[1]:coords[3]]
+    pil_image = Image.fromarray(imarray)
+    if pil:
+        return pil_image
+    image_bytes = io.BytesIO()
+    pil_image.save(image_bytes, 'JPEG')
+    image_bytes.seek(0)
     return image_bytes
 
 

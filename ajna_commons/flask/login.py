@@ -9,7 +9,8 @@ DBUser.dbsession deve receber a conexão com o BD.
 """
 from urllib.parse import urljoin, urlparse
 
-from flask import abort, redirect, render_template, request, url_for
+from flask import (abort, Blueprint, Flask, redirect, render_template, request,
+                   url_for)
 from flask_login import (LoginManager, UserMixin, login_required, login_user,
                          logout_user)
 # from urllib.parse import urlparse, urljoin
@@ -25,14 +26,16 @@ login_manager.session_protection = 'strong'
 login_manager.login_message = u'Efetue login para começar.'
 
 
-def configure(app):
+def configure(app: Flask):
     """Insere as views de login e logout na app.
 
     Para utilizar, importar modulo login e chamar configure(app)
     em uma aplicação Flask.
 
     """
-    @app.route('/login', methods=['GET', 'POST'])
+    commons = Blueprint('commons', __name__)
+
+    @commons.route('/login', methods=['GET', 'POST'])
     def login():
         """View para efetuar login."""
         if request.method == 'POST':
@@ -52,7 +55,7 @@ def configure(app):
         else:
             return render_template('login.html', form=request.form)
 
-    @app.route('/logout')
+    @commons.route('/logout')
     @login_required
     def logout():
         """View para efetuar logout."""
@@ -67,8 +70,10 @@ def configure(app):
         """Gerenciador de usuário não autorizado padrão do flask-login."""
         message = 'Não autorizado! ' + \
             'Efetue login novamente com usuário e senha válidos.'
-        return redirect(url_for('login',
+        return redirect(url_for('commons.login',
                                 message=message))
+
+    app.register_blueprint(commons)
 
 
 class DBUser():
@@ -82,10 +87,10 @@ class DBUser():
     DBUser que modifique os métodos get e add.
 
     A maioria dos métodos são estáticos, sendo usados diretamente:
-        DBUser.dbsession = meu_PyMongoClient
-        DBUser.get(usuario, senha) retorna DBUSer se existir e
-            se senha correta
-        DBUser.add(usuario, senha) adiciona DBUser
+
+    DBUser.dbsession = meu_PyMongoClient
+    DBUser.get(usuario, senha) retorna DBUSer se existir e se senha correta
+    DBUser.add(usuario, senha) adiciona DBUser
 
     A classe DBUser é utilizada pela classe User, padrão do flask-login
 

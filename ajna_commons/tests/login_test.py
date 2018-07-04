@@ -19,7 +19,7 @@ class FlaskTestCase(unittest.TestCase):
             if current_user.is_authenticated:
                 return 'OK'
             else:
-                return redirect(url_for('login'))
+                return redirect(url_for('commons.login'))
         app.testing = True
         self.app = app.test_client()
         self.db = MongoClient(host=MONGODB_URI).unit_test

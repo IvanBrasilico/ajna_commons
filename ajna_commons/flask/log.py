@@ -12,7 +12,7 @@ import os
 import sys
 
 from flask_login import current_user
-from raven.handlers.logging import SentryHandler
+# from raven.handlers.logging import SentryHandler
 
 # from ajna_commons.flask.conf import SENTRY_DSN
 SENTRY_DSN = None
@@ -45,10 +45,12 @@ class CustomAdapter(logging.LoggerAdapter):
 
 logging.basicConfig(level=os.environ.get('LOGLEVEL', 'INFO'))
 logger = logging.getLogger('ajna')
-
-fn = getattr(sys.modules['__main__'], '__file__')
-root_path = os.path.abspath(os.path.dirname(fn))
-if root_path.find('.exe') != -1:
+try:
+    fn = getattr(sys.modules['__main__'], '__file__')
+    root_path = os.path.abspath(os.path.dirname(fn))
+    if root_path.find('.exe') != -1:
+        root_path = os.path.dirname(__file__)
+except AttributeError:
     root_path = os.path.dirname(__file__)
 log_file = os.path.join(root_path, 'error.log')
 print('Fazendo log de erros e alertas no arquivo ', log_file)
@@ -77,13 +79,14 @@ else:
     logger.addHandler(error_handler)
     out_handler.setLevel(logging.INFO)
     logger.addHandler(out_handler)
-    sentry_handler = None
+    """sentry_handler = None
     if SENTRY_DSN:
         sentry_handler = SentryHandler(SENTRY_DSN)
         sentry_handler.setFormatter(formatter)
         sentry_handler.setLevel(logging.WARNING)
         sentry_handler.setFormatter(formatter)
         logger.addHandler(sentry_handler)
+    """
     logger.setLevel(logging.INFO)
     # Only show info, not warnings, erros, or critical in this log
     activity_handler.addFilter(MyFilter(logging.INFO))

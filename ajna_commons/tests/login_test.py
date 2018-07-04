@@ -2,6 +2,9 @@
 import unittest
 
 from flask import Flask, redirect, url_for
+from flask_bootstrap import Bootstrap
+from flask_nav import Nav
+from flask_nav.elements import Navbar, View
 from flask_login import current_user
 from pymongo import MongoClient
 from ajna_commons.flask.conf import MONGODB_URI
@@ -12,6 +15,8 @@ import ajna_commons.flask.login as login
 class FlaskTestCase(unittest.TestCase):
     def setUp(self):
         app = Flask(__name__)
+        Bootstrap(app)
+        nav = Nav(app)
         app.secret_key = 'DUMMY'
 
         @app.route('/')
@@ -20,6 +25,13 @@ class FlaskTestCase(unittest.TestCase):
                 return 'OK'
             else:
                 return redirect(url_for('commons.login'))
+
+        @nav.navigation()
+        def mynavbar():
+            """Menu da aplicação."""
+            items = [View('Home', 'index')]
+            return Navbar('teste', *items)
+
         app.testing = True
         self.app = app.test_client()
         self.db = MongoClient(host=MONGODB_URI).unit_test
@@ -66,3 +78,8 @@ class FlaskTestCase(unittest.TestCase):
         assert auser3 is None
         auser4 = login.DBUser.get('ajna', '1234')
         assert auser4.name == 'ajna'
+
+    def test_404(self):
+        rv = self.app.get('/non_ecsiste')
+        assert rv is not None
+        assert b'404' in rv.data

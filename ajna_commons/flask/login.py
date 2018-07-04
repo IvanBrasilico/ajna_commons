@@ -9,13 +9,13 @@ DBUser.dbsession deve receber a conexão com o BD.
 """
 from urllib.parse import urljoin, urlparse
 
-from flask import (abort, Blueprint, Flask, redirect, render_template, request,
-                   url_for)
+from flask import (abort, Blueprint, Flask, flash, redirect,
+                   render_template, request, url_for)
 from flask_login import (LoginManager, UserMixin, login_required, login_user,
                          logout_user)
 # from urllib.parse import urlparse, urljoin
 from werkzeug.security import check_password_hash, generate_password_hash
-
+import ajna_commons.flask.custom_messages as custom_messages
 login_manager = LoginManager()
 login_manager.login_view = 'login'
 login_manager.session_protection = 'strong'
@@ -34,6 +34,7 @@ def configure(app: Flask):
 
     """
     commons = Blueprint('commons', __name__, template_folder='templates')
+    custom_messages.configure(commons)
 
     @commons.route('/login', methods=['GET', 'POST'])
     def login():
@@ -41,6 +42,8 @@ def configure(app: Flask):
         if request.method == 'POST':
             username = request.form.get('username')
             password = request.form.get('senha')
+            message = request.form.get('message')
+            flash(message)
             registered_user = authenticate(username, password)
             if registered_user is not None:
                 print('Logged in..')

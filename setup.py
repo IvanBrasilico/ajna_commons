@@ -12,7 +12,10 @@ setup(
     install_requires=[
         'click',
         'dominate',
+        'flask',
         'flask-login',
+        'flask-nav',
+        'flask-wtf',
         'imageio',
         'pymongo',
         'raven',

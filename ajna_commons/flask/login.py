@@ -33,7 +33,7 @@ def configure(app: Flask):
     em uma aplicação Flask.
 
     """
-    commons = Blueprint('commons', __name__)
+    commons = Blueprint('commons', __name__, template_folder='templates')
 
     @commons.route('/login', methods=['GET', 'POST'])
     def login():

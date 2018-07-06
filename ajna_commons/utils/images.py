@@ -1,5 +1,6 @@
 """Funções para tratamento de imagens."""
 import io
+
 from bson.objectid import ObjectId
 from gridfs import GridFS
 from PIL import Image

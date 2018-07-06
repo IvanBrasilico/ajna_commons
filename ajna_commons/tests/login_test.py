@@ -3,14 +3,14 @@ import unittest
 
 from flask import Flask, redirect, url_for
 from flask_bootstrap import Bootstrap
-from flask_nav import Nav
-from flask_wtf.csrf import CSRFProtect
-from flask_nav.elements import Navbar, View
 from flask_login import current_user
+from flask_nav import Nav
+from flask_nav.elements import Navbar, View
+from flask_wtf.csrf import CSRFProtect
 from pymongo import MongoClient
-from ajna_commons.flask.conf import MONGODB_URI
 
 import ajna_commons.flask.login as login
+from ajna_commons.flask.conf import MONGODB_URI
 
 
 class FlaskTestCase(unittest.TestCase):

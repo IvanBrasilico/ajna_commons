@@ -9,12 +9,13 @@ DBUser.dbsession deve receber a conexão com o BD.
 """
 from urllib.parse import urljoin, urlparse
 
-from flask import (abort, Blueprint, Flask, flash, redirect,
-                   render_template, request, url_for)
+from flask import (Blueprint, Flask, abort, flash, redirect, render_template,
+                   request, url_for)
 from flask_login import (LoginManager, UserMixin, login_required, login_user,
                          logout_user)
 # from urllib.parse import urlparse, urljoin
 from werkzeug.security import check_password_hash, generate_password_hash
+
 import ajna_commons.flask.custom_messages as custom_messages
 
 
@@ -26,7 +27,7 @@ def configure(app: Flask):
 
     """
     login_manager = LoginManager()
-    login_manager.login_view = 'login'
+    login_manager.login_view = '/login'
     login_manager.session_protection = 'strong'
     login_manager.init_app(app)
 
@@ -65,7 +66,7 @@ def configure(app: Flask):
         next = request.args.get('next')
         if not is_safe_url(next):
             next = None
-        return redirect(next or url_for('index'))
+        return redirect(url_for('index'))
 
     # @login_manager.unauthorized_handler
     @app.errorhandler(401)

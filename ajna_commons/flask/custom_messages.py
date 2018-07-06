@@ -5,8 +5,8 @@ utilizados, se necessário.
 """
 
 from flask import render_template
-
 from flask_wtf.csrf import CSRFError
+
 #  http://flask.pocoo.org/docs/0.12/patterns/packages/
 
 

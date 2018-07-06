@@ -1,6 +1,5 @@
 """Funções para tratamento de imagens."""
 import io
-import numpy as np
 from bson.objectid import ObjectId
 from gridfs import GridFS
 from PIL import Image
@@ -24,9 +23,8 @@ def recorta_imagem(image, coords, pil=False):
         pil_image = Image.open(io.BytesIO(image))
     else:
         pil_image = image
-    imarray = np.asarray(pil_image)
-    imarray = imarray[coords[0]:coords[2], coords[1]:coords[3]]
-    pil_image = Image.fromarray(imarray)
+
+    pil_image = pil_image.crop((coords[1], coords[0], coords[3], coords[2]))
     if pil:
         return pil_image
     image_bytes = io.BytesIO()

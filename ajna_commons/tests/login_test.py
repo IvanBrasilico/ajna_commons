@@ -4,6 +4,7 @@ import unittest
 from flask import Flask, redirect, url_for
 from flask_bootstrap import Bootstrap
 from flask_nav import Nav
+from flask_wtf.csrf import CSRFProtect
 from flask_nav.elements import Navbar, View
 from flask_login import current_user
 from pymongo import MongoClient
@@ -15,8 +16,11 @@ import ajna_commons.flask.login as login
 class FlaskTestCase(unittest.TestCase):
     def setUp(self):
         app = Flask(__name__)
+        self.app = app
+        CSRFProtect(app)
         Bootstrap(app)
         nav = Nav(app)
+
         app.secret_key = 'DUMMY'
 
         @app.route('/')
@@ -33,9 +37,8 @@ class FlaskTestCase(unittest.TestCase):
             return Navbar('teste', *items)
 
         app.testing = True
-        self.app = app.test_client()
+        self.client = app.test_client()
         self.db = MongoClient(host=MONGODB_URI).unit_test
-        login.login_manager.init_app(app)
         login.configure(app)
         login.DBUser.dbsession = self.db
         login.DBUser.add('ajna', 'ajna')
@@ -45,22 +48,33 @@ class FlaskTestCase(unittest.TestCase):
         rv = self.logout()
         assert rv is not None
 
+    def get_token(self, url):
+        response = self.client.get(url, follow_redirects=True)
+        csrf_token = response.data.decode()
+        begin = csrf_token.find('csrf_token"') + 10
+        end = csrf_token.find('username"') - 10
+        csrf_token = csrf_token[begin: end]
+        begin = csrf_token.find('value="') + 7
+        end = csrf_token.find('/>')
+        self.csrf_token = csrf_token[begin: end]
+        return self.csrf_token
+
     def login(self, username, senha):
-        url = '/login'
-        return self.app.post(url, data=dict(
+        self.get_token('/login')
+        return self.client.post('/login', data=dict(
             username=username,
             senha=senha,
+            csrf_token=self.csrf_token
         ), follow_redirects=True)
 
     def logout(self):
-        return self.app.get('/logout', follow_redirects=True)
+        return self.client.get('/logoout', follow_redirects=True)
 
     def test_login_invalido(self):
         rv = self.login('none', 'error')
-        print(rv)
+        print(rv.data)
         assert rv is not None
-        assert b'401' in rv.data
-        assert b'Unauthorized' in rv.data
+        assert b'username' in rv.data
 
     def test_login(self):
         rv = self.login('ajna', 'ajna')
@@ -80,6 +94,6 @@ class FlaskTestCase(unittest.TestCase):
         assert auser4.name == 'ajna'
 
     def test_404(self):
-        rv = self.app.get('/non_ecsiste')
+        rv = self.client.get('/non_ecsiste')
         assert rv is not None
         assert b'404' in rv.data

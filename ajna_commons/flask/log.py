@@ -16,6 +16,7 @@ from flask_login import current_user
 
 # from ajna_commons.flask.conf import SENTRY_DSN
 SENTRY_DSN = None
+sentry_handler = None
 
 
 class MyFilter(object):
@@ -68,18 +69,16 @@ error_handler.setFormatter(formatter)
 activity_handler.setFormatter(formatter)
 out_handler.setFormatter(formatter)
 error_handler.setLevel(logging.WARNING)
+activity_handler.setLevel(logging.INFO)
+activity_handler.addFilter(MyFilter(logging.INFO))
+logger.addHandler(activity_handler)
+logger.addHandler(error_handler)
 
 if os.environ.get('DEBUG', 'None') == '1':
     logger.setLevel(logging.DEBUG)
-    logger.addHandler(out_handler)
-    logger.addHandler(error_handler)
 else:
-    activity_handler.setLevel(logging.INFO)
-    logger.addHandler(activity_handler)
-    logger.addHandler(error_handler)
     out_handler.setLevel(logging.INFO)
-    logger.addHandler(out_handler)
-    """sentry_handler = None
+    """
     if SENTRY_DSN:
         sentry_handler = SentryHandler(SENTRY_DSN)
         sentry_handler.setFormatter(formatter)
@@ -89,7 +88,7 @@ else:
     """
     logger.setLevel(logging.INFO)
     # Only show info, not warnings, erros, or critical in this log
-    activity_handler.addFilter(MyFilter(logging.INFO))
+logger.addHandler(out_handler)
 
 
 def user_name(user):

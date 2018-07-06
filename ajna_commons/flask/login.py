@@ -16,14 +16,6 @@ from flask_login import (LoginManager, UserMixin, login_required, login_user,
 # from urllib.parse import urlparse, urljoin
 from werkzeug.security import check_password_hash, generate_password_hash
 import ajna_commons.flask.custom_messages as custom_messages
-login_manager = LoginManager()
-login_manager.login_view = 'login'
-login_manager.session_protection = 'strong'
-
-# Customized login error
-#  http://flask.pocoo.org/docs/0.12/patterns/packages/
-# https://flask-login.readthedocs.io/en/latest/ - Customizing the login
-login_manager.login_message = u'Efetue login para começar.'
 
 
 def configure(app: Flask):
@@ -33,6 +25,11 @@ def configure(app: Flask):
     em uma aplicação Flask.
 
     """
+    login_manager = LoginManager()
+    login_manager.login_view = 'login'
+    login_manager.session_protection = 'strong'
+    login_manager.init_app(app)
+
     commons = Blueprint('commons', __name__, template_folder='templates')
     custom_messages.configure(commons)
 
@@ -42,10 +39,10 @@ def configure(app: Flask):
         if request.method == 'POST':
             username = request.form.get('username')
             password = request.form.get('senha')
-            message = request.form.get('message')
-            flash(message)
+            message = request.args.get('message')
             registered_user = authenticate(username, password)
             if registered_user is not None:
+                flash('Usuário autenticado.')
                 print('Logged in..')
                 print(login_user(registered_user))
                 # print('Current user ', current_user)
@@ -54,6 +51,8 @@ def configure(app: Flask):
                     return abort(400)
                 return redirect(next_url or url_for('index'))
             else:
+                if message:
+                    flash(message)
                 return abort(401)
         else:
             return render_template('login.html', form=request.form)
@@ -68,13 +67,21 @@ def configure(app: Flask):
             next = None
         return redirect(next or url_for('index'))
 
-    @login_manager.unauthorized_handler
-    def unauthorized():
+    # @login_manager.unauthorized_handler
+    @app.errorhandler(401)
+    def unauthorized(args):
         """Gerenciador de usuário não autorizado padrão do flask-login."""
+        print(args)
         message = 'Não autorizado! ' + \
             'Efetue login novamente com usuário e senha válidos.'
         return redirect(url_for('commons.login',
                                 message=message))
+
+    @login_manager.user_loader
+    def load_user(userid):
+        """Método padrão do flask-login. Repassa responsabilidade a User."""
+        user_entry = User.get(userid)
+        return user_entry
 
     app.register_blueprint(commons)
 
@@ -193,13 +200,6 @@ def authenticate(username, password):
     """Método padrão do flask-login. Repassa responsabilidade a User."""
     user_entry = User.get(username, password)
     # print('authenticate user entry ', user_entry)
-    return user_entry
-
-
-@login_manager.user_loader
-def load_user(userid):
-    """Método padrão do flask-login. Repassa responsabilidade a User."""
-    user_entry = User.get(userid)
     return user_entry
 
 

@@ -1,6 +1,7 @@
 import unittest
 
-from ajna_commons.utils.sanitiza import (ascii_sanitizar, sanitizar,
+from ajna_commons.utils.sanitiza import (ascii_sanitizar, mongo_sanitizar,
+                                         sanitizar,
                                          sanitizar_lista, unicode_sanitizar)
 
 
@@ -27,6 +28,13 @@ class TestModel(unittest.TestCase):
         assert listas[0][1] == depois2
         assert listas[1][1] == depois
         assert listas[1][0] == depois2
+
+    def test_mongo_sanitizar(self):
+        teste = '{$where: \'atacking\': "DANGEROUS! Test. 2.53"}function();}'
+        esperado = 'where atacking DANGEROUS! Test. 2.53function'
+        resultado = mongo_sanitizar(teste)
+        print(resultado)
+        assert resultado == esperado
 
 
 if __name__ == '__main__':

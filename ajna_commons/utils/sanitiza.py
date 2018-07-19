@@ -7,6 +7,8 @@ def ascii_sanitizar(text):
 
     Retorna NFC normalizado ASCII
     """
+    if not text:
+        return None
     return unicodedata.normalize('NFKD', text) \
         .encode('ASCII', 'ignore') \
         .decode('ASCII')
@@ -16,9 +18,13 @@ def unicode_sanitizar(text):
 
     Retorna NFC normalizado unicode
     """
+    if not text:
+        return None
     norm_txt = unicodedata.normalize('NFD', text)
     shaved = ''.join(char for char in norm_txt
                      if not unicodedata.combining(char))
+    if not shaved:
+        return None
     return unicodedata.normalize('NFC', shaved)
 
 def mongo_sanitizar(text):
@@ -27,9 +33,13 @@ def mongo_sanitizar(text):
     NUMEROS = u'0123456789'
     SINAIS = u'*.,+&%@! '
     secure = LETRAS + LETRAS.upper() + NUMEROS + SINAIS
+    if not text:
+        return None
     norm_txt = unicodedata.normalize('NFD', text)
     shaved = ''.join(char for char in norm_txt
                      if char in secure)
+    if not shaved:
+        return None
     return unicodedata.normalize('NFC', shaved)
 
 

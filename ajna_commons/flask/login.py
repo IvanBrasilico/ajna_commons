@@ -17,6 +17,8 @@ from flask_login import (LoginManager, UserMixin, login_required, login_user,
 from werkzeug.security import check_password_hash, generate_password_hash
 
 import ajna_commons.flask.custom_messages as custom_messages
+from ajna_commons.utils.sanitiza import mongo_sanitizar
+from ajna_commons.flask.log import logger
 
 
 def configure(app: Flask):
@@ -38,15 +40,16 @@ def configure(app: Flask):
     def login():
         """View para efetuar login."""
         if request.method == 'POST':
-            username = request.form.get('username')
-            password = request.form.get('senha')
+            username = mongo_sanitizar(request.form.get('username'))
+            password = mongo_sanitizar(request.form.get('senha'))
             message = request.args.get('message')
+
             registered_user = authenticate(username, password)
             if registered_user is not None:
                 flash('Usuário autenticado.')
-                print('Logged in..')
-                print(login_user(registered_user))
-                # print('Current user ', current_user)
+                logger.debug('Logged in..')
+                logger.debug(login_user(registered_user))
+                # logger.debug('Current user %s' % current_user)
                 next_url = request.args.get('next')
                 if not is_safe_url(next_url):
                     return abort(400)
@@ -72,7 +75,7 @@ def configure(app: Flask):
     @app.errorhandler(401)
     def unauthorized(args):
         """Gerenciador de usuário não autorizado padrão do flask-login."""
-        print(args)
+        logger.debug(args)
         message = 'Não autorizado! ' + \
             'Efetue login novamente com usuário e senha válidos.'
         return redirect(url_for('commons.login',
@@ -116,17 +119,23 @@ class DBUser():
         self._password = password
 
     @classmethod
+    def sanitize(cls, username, password):
+        """Sanitização das entradas."""
+        return mongo_sanitizar(username), mongo_sanitizar(password)
+
+    @classmethod
     def add(cls, username, password):
         """Cria usuário ou muda senha se ele existe."""
         if not cls.dbsession:
             raise Exception('Sem conexão com o Banco de Dados!')
+        username, password = cls.sanitize(username, password)
         encripted = cls.encript(password)
         cursor = cls.dbsession.users.update(
             {'username': username},
             {'username': username,
              'password': encripted},
             upsert=True)
-        print('cursor', cursor)
+        logger.debug('cursor', cursor)
         return DBUser.get(username, password)
 
     @classmethod
@@ -150,9 +159,10 @@ class DBUser():
         Usuario não encontrado OU senha inválida.
 
         """
-        print('Getting user. dbsession=', cls.dbsession)
+        logger.debug('Getting user. dbsession=', cls.dbsession)
         if cls.dbsession:
-            # print('DBSEssion ', cls.dbsession)
+            username, password = cls.sanitize(username, password)
+            # logger.debug('DBSEssion %s' % cls.dbsession)
             dbuser = DBUser(username, password)
             user = cls.dbsession.users.find_one(
                 {'username': username})
@@ -160,8 +170,9 @@ class DBUser():
                 return None
             if password:
                 encripted = user['password']
-                # print('username', username)  # , 'passed password', password)
-                # print('encripted', encripted)
+                # logger.debug('username %s, passed password %s ' % \
+                # (username, password))
+                # logger.debug('encripted %s' % encripted)
                 if not dbuser.check(encripted):
                     return None
             return DBUser(username, password)
@@ -200,7 +211,7 @@ class User(UserMixin):
 def authenticate(username, password):
     """Método padrão do flask-login. Repassa responsabilidade a User."""
     user_entry = User.get(username, password)
-    # print('authenticate user entry ', user_entry)
+    # logger.debug('authenticate user entry %s' % user_entry)
     return user_entry
 
 

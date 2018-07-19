@@ -1,4 +1,16 @@
-"""Transforma imagem(ns) e xml(s) em registro(s) BSON."""
+"""Transforma imagem(ns) e xml(s) em registro(s) BSON.
+
+Os arquivos tem origem em dicionários do Python que são codificados,
+através da biblioteca BSON do MongoDB, em arquivos BSON, que são
+um JSON binário padrão no MongoDB. O BsonImage corresponde exatamente a
+um registro do MongoDB GridFS. O BsonImageList é um dicionário, chave
+index sequencial da lista e valor BsonImage.
+
+Assim, deve ser possível abrir e também gerar os arquivos facilmente em outras
+linguagens se necessário, ou até pelo MongoDB/Mongoose, como se fossem arquivos
+JSON.
+
+"""
 import gzip
 import os
 from collections import OrderedDict

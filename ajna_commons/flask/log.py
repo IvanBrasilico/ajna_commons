@@ -17,35 +17,24 @@ from flask_login import current_user
 
 # from ajna_commons.flask.conf import SENTRY_DSN
 SENTRY_DSN = None
+FORMAT_STRING = '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'
 sentry_handler = None
 
 
-class MyFilter(object):
+class MyFilter(logging.Filter):
     """Log only especified level (not upper levels)."""
 
     def __init__(self, level):
         """Configura level desejado."""
         self.__level = level
 
-    def filter(self, logRecord):
+    def filter(self, log_record):
         """Retorna true se filtro no nível configurado."""
-        return logRecord.levelno <= self.__level
+        return log_record.levelno <= self.__level
 
 
-class CustomAdapter(logging.LoggerAdapter):
-    """Formata string de log.
-
-    This example adapter expects the passed in dict-like object to have a
-    'connid' key, whose value in brackets is prepended to the log message.
-    """
-
-    def process(self, msg, kwargs):
-        """Returna string formatada."""
-        return '[%s][%s] %s' % (self.extra['username'],
-                                self.extra['teste'], msg), kwargs
-
-
-logging.basicConfig(level=os.environ.get('LOGLEVEL', 'INFO'))
+logging.basicConfig(level=os.environ.get('LOGLEVEL', 'INFO'),
+                    format=FORMAT_STRING)
 logger = logging.getLogger('ajna')
 try:
     fn = getattr(sys.modules['__main__'], '__file__')
@@ -54,6 +43,7 @@ try:
         root_path = os.path.dirname(__file__)
 except AttributeError:
     root_path = os.path.dirname(__file__)
+
 log_file = os.path.join(root_path, 'error.log')
 print('Fazendo log de erros e alertas no arquivo ', log_file)
 error_handler = logging.FileHandler(log_file)
@@ -64,14 +54,14 @@ activity_handler = logging.FileHandler(activity_file)
 
 out_handler = logging.StreamHandler(sys.stdout)
 
-
-formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+formatter = logging.Formatter(
+    fmt=FORMAT_STRING,
+    datefmt='%Y-%m-%d %H:%M')
 error_handler.setFormatter(formatter)
 activity_handler.setFormatter(formatter)
 out_handler.setFormatter(formatter)
 error_handler.setLevel(logging.WARNING)
 activity_handler.setLevel(logging.INFO)
-activity_handler.addFilter(MyFilter(logging.INFO))
 logger.addHandler(activity_handler)
 logger.addHandler(error_handler)
 
@@ -89,17 +79,12 @@ else:
     """
     logger.setLevel(logging.INFO)
     # Only show info, not warnings, erros, or critical in this log
-logger.addHandler(out_handler)
+# logger.addHandler(out_handler)
 
-
-def user_name(user):
-    """Recupera nome do usuário ativo. Se não houver retorna 'no user'."""
-    if user:
-        return user.name
-    return 'no user'
-
-
-adapter = CustomAdapter(logger, {'username': user_name(
-    current_user), 'teste': 'Nome de usuário'})
-
+activity_handler.addFilter(MyFilter(logging.INFO))
 logger.info('Configuração de log efetuada')
+
+if __name__ == '__main__':
+    logger.debug('TESTE DE LOG')
+    logger.warning('TESTE DE LOG')
+    logger.error('TESTE DE LOG')

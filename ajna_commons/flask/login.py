@@ -9,9 +9,9 @@ DBUser.dbsession deve receber a conexão com o BD.
 """
 from urllib.parse import urljoin, urlparse
 
-from flask import (Blueprint, Flask, abort, flash, redirect, render_template,
+from flask import (Blueprint, Flask, abort, flash, g, redirect, render_template,
                    request, url_for)
-from flask_login import (LoginManager, UserMixin, login_required, login_user,
+from flask_login import (current_user, LoginManager, UserMixin, login_required, login_user,
                          logout_user)
 # from urllib.parse import urlparse, urljoin
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -47,13 +47,10 @@ def configure(app: Flask):
             registered_user = authenticate(username, password)
             if registered_user is not None:
                 flash('Usuário autenticado.')
-                logger.debug('Logged in..')
-                logger.debug(login_user(registered_user))
-                # logger.debug('Current user %s' % current_user)
-                next_url = request.args.get('next')
-                if not is_safe_url(next_url):
-                    return abort(400)
-                return redirect(next_url or url_for('index'))
+                login_user(registered_user)
+                logger.info('Usuário %s autenticou' % current_user.name)
+                # g['username'] = current_user.name
+                return redirect(url_for('index'))
             else:
                 if message:
                     flash(message)
@@ -159,7 +156,7 @@ class DBUser():
         Usuario não encontrado OU senha inválida.
 
         """
-        logger.debug('Getting user. dbsession=', cls.dbsession)
+        logger.debug('Getting user. dbsession= %s' % cls.dbsession)
         if cls.dbsession:
             username, password = cls.sanitize(username, password)
             # logger.debug('DBSEssion %s' % cls.dbsession)

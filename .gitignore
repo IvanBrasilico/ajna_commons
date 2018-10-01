@@ -129,3 +129,4 @@ SECRET
 *.bson
 *.bson.zip
 *.bbson.zip
+.idea/

@@ -26,10 +26,10 @@ class ContextualFilter(logging.Filter):
 
 
 def configure_applog(app):
-    log_format = ("%(utcnow)s\tl=%(levelname)s\tu=%(user_id)s\tip=%(ip)s"
-                  "\tm=%(method)s\turl=%(url)s\tmsg=%(message)s")
-    formatter = logging.Formatter(log_format)
-
+    """Cria logger para o processo web (flask)."""
+    # log_format = ('%(utcnow)s\tl=%(levelname)s\tu=%(user_id)s\tip=%(ip)s'
+    #               '\tm=%(method)s\turl=%(url)s\tmsg=%(message)s')
+    # formatter = logging.Formatter(log_format)
     app.logger.setLevel(logging.DEBUG)
     # app.logger.addFilter(ContextualFilter())
     app.logger.removeHandler(default_handler)
@@ -40,17 +40,16 @@ def configure_applog(app):
     wsgi.addHandler(log.activity_handler)
     if log.sentry_handler:
         app.logger.addHandler(log.sentry_handler)
+
     @app.before_request
     def before_request_callback():
         path = request.path
         method = request.method
         ip = request.environ.get('HTTP_X_REAL_IP',
                                  request.remote_addr)
-        user_name = 'no user'
         try:
-           user_name = current_user.name
+            user_name = current_user.name
         except:
-            pass
+            user_name = 'no user'
         app.logger.info('url: %s %s IP:%s User: %s' %
                         (path, method, ip, user_name))
-

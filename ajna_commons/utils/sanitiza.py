@@ -13,6 +13,7 @@ def ascii_sanitizar(text):
         .encode('ASCII', 'ignore') \
         .decode('ASCII')
 
+
 def unicode_sanitizar(text):
     """Remove marcas de diacríticos (acentos e caracteres especiais).
 
@@ -27,9 +28,10 @@ def unicode_sanitizar(text):
         return None
     return unicodedata.normalize('NFC', shaved)
 
+
 def mongo_sanitizar(text):
     """Remove todo caractere que pode ser usado em ataque MongoDB injection."""
-    LETRAS = u'abcdefghijklmnopqrstuvwxyz' 
+    LETRAS = u'abcdefghijklmnopqrstuvwxyz'
     NUMEROS = u'0123456789'
     SINAIS = u'*.,+&%@! '
     secure = LETRAS + LETRAS.upper() + NUMEROS + SINAIS

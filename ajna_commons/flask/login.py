@@ -9,10 +9,10 @@ DBUser.dbsession deve receber a conexão com o BD.
 """
 from urllib.parse import urljoin, urlparse
 
-from flask import (Blueprint, Flask, abort, flash, g, redirect, render_template,
-                   request, url_for)
-from flask_login import (current_user, LoginManager, UserMixin, login_required, login_user,
-                         logout_user)
+from flask import (Blueprint, Flask, abort, flash, redirect,
+                   render_template, request, url_for)
+from flask_login import (current_user, LoginManager, UserMixin, login_required,
+                         login_user, logout_user)
 # from urllib.parse import urlparse, urljoin
 from werkzeug.security import check_password_hash, generate_password_hash
 

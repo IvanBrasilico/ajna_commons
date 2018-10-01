@@ -11,8 +11,6 @@ import logging
 import os
 import sys
 
-from flask_login import current_user
-
 # from raven.handlers.logging import SentryHandler
 
 # from ajna_commons.flask.conf import SENTRY_DSN

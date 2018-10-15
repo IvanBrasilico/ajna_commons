@@ -36,7 +36,7 @@ if SECRET is None:
     with open('SECRET', 'wb') as out:
         pickle.dump(SECRET, out, pickle.HIGHEST_PROTOCOL)
 
-
+PADMA_REDIS = 'PADMA_REDIS'
 BSON_REDIS = 'bson'
 REDIS_URL = os.environ.get('REDIS_URL')
 if not REDIS_URL:
